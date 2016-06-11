@@ -48,16 +48,18 @@
   jdyrlandweaver
   =========================
 """
-
 import mdl
 from display import *
 from matrix import *
 from draw import *
 
+XRES = 500
+YRES = 500
+
 num_frames = 0
 basename = ""
 knobs = []
-
+zbuffer = new_screen()
 
 """======== first_pass( commands, symbols ) ==========
 

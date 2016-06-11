@@ -33,14 +33,17 @@ def scanline_conversion(points, screen, color):
         print 'Need at least 3 points to fill'
         p = 0
     while p < len(points)-2:
+        counter = 0
         pt = points[p]
         pm = points[p+1]
         pb = points[p+2]
         d0 = (pt[0] - pb[0])/(pt[1] - pb[1])
         d1 = (pm[0] - pb[0])/(pm[1] - pb[1])
-        while :
-            draw_line(screen, pb[0], pb[1], pb[0], pb[1], color)
-            draw_line(screen, pb[0] + d0, pb[1] + 1, pb[0] + d1, pb[1] + 1, color)
+        while counter < pt[1] - pb[1]:
+            #draw_line(screen, pb[0], pb[1], pb[0], pb[1], color)
+            #draw_line(screen, pb[0] + d0, pb[1] + 1, pb[0] + d1, pb[1] + 1, color)
+            draw_line(screen, pb[0] + counter * d0, pb[1] + counter, pb[0] + counter * d1, pb[1] + counter, color)
+            counter ++
 
 def add_box( points, x, y, z, width, height, depth ):
     x1 = x + width
