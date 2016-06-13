@@ -28,23 +28,93 @@ def draw_polygons( points, screen, color ):
                        points[p][0], points[p][1], color )
         p+= 3
 
+
+def zdraw_polygons( points, screen, color, zbuffer, lightsources ):
+
+    if len(points) < 3:
+        print 'Need at least 3 points to draw a polygon!'
+        return
+
+    p = 0
+    while p < len( points ) - 2:
+
+        if calculate_dot( points, p ) < 0:
+            color = lighting(color, light_normal(points, p), lightsources)
+
+            draw_line( screen, points[p][0], points[p][1], points[p][2],
+                       points[p+1][0], points[p+1][1], points[p+1][2], color, zbuffer )
+
+            draw_line( screen, points[p+1][0], points[p+1][1], points[p+1][2],
+                       points[p+2][0], points[p+2][1], points[p+2][2], color, zbuffer )
+
+            draw_line( screen, points[p+2][0], points[p+2][1], points[p+2][2],
+                       points[p][0], points[p][1],  points[p][2], color, zbuffer )
+
+            scanline([points[p], points[p + 1], points[p + 2]], screen, color, zbuffer)
+        p+= 3
+
+def lighting( color, normal, lightsource ):
+    ambient = color
+    diffuse = [0, 0, 0]
+    specular = [0, 0, 0]
+    for source in lightsources:
+        if (source[0] == "diffuse"):
+            pass
+        if (source[0] == "specular"):
+            pass
+    return [ambient[0] + diffuse[0] + specular[0], ambient[1] + diffuse[1] + specular[1], ambient[2] + diffuse[2] + specular[2]]
+
+        
 def scanline_conversion(points, screen, color, zbuffer):
     if len(points) < 3:
         print 'Need at least 3 points to fill'
     p = 0
     while p < len(points)-2:
+        points = sorted(points,key=lambda x:x[1])
+        
         counter = 0
-        pt = points[p]
+        pb = points[p]
         pm = points[p+1]
-        pb = points[p+2]
-        d0 = (pt[0] - pb[0])/(pt[1] - pb[1])
-        d1 = (pm[0] - pb[0])/(pm[1] - pb[1])
-        while counter < pt[1] - pb[1]:
-            #draw_line(screen, pb[0], pb[1], pb[0], pb[1], color)
-            #draw_line(screen, pb[0] + d0, pb[1] + 1, pb[0] + d1, pb[1] + 1, color)
-            draw_line(screen, pb[0] + counter * d0, pb[1] + counter, pb[0] + counter * d1, pb[1] + counter, color)
-            counter+=1
+        pt = points[p+2]
 
+        tx = pt[0]
+        ty = pt[1]
+        tz = pt[2]
+        mx = pm[0]
+        my = pm[1]
+        mz = pm[2]
+        bx = pb[0]
+        by = pb[1]
+        bz = pb[2]
+
+        if (my != ty):
+            d1 = (mx - tx) / (my - ty)
+            dz1 = (mz - tz) / (my - ty)
+        if (by != my):
+            d2 = (bx - mx) / (by - my)
+            dz2 = (bz - mz) / (by - my)
+        
+        d0 = (tx - bx)/(ty - by)
+        dz0 = (tz - bz)/(ty - by)
+            
+        while by + counter < ty:
+
+            newx0 = tx + counter * d0
+            newy = ty + counter
+            newz = tz + counter * dz0
+            if (newy < my):
+                newx1 = tx + counter * d1
+                newz1 = tz + counter * dz1
+            else:
+                newx1 = mx + (newy - my) * d2
+                newz1 = mz + (newy - my) * dz2
+
+            draw_line( screen, newx0, newy, newz, newx1, newy, newz1, color, z_buffer)
+
+            counter += 1
+            
+        p+=3
+            
 def add_box( points, x, y, z, width, height, depth ):
     x1 = x + width
     y1 = y - height
@@ -297,6 +367,17 @@ def draw_lines( matrix, screen, color ):
                    matrix[p+1][0], matrix[p+1][1], color )
         p+= 2
 
+def zdraw_lines( matrix, screen, color, zbuffer ):
+    if len( matrix ) < 2:
+        print "Need at least 2 points to draw a line"
+
+    p = 0
+    while p < len( matrix ) - 1:
+        zdraw_line( screen, matrix[p][0], matrix[p][1], matrix[p][2],
+                   matrix[p+1][0], matrix[p+1][1], matrix[p+1][2], color, zbuffer )
+        p+= 2
+
+
 def add_edge( matrix, x0, y0, z0, x1, y1, z1 ):
     add_point( matrix, x0, y0, z0 )
     add_point( matrix, x1, y1, z1 )
@@ -373,3 +454,78 @@ def draw_line( screen, x0, y0, x1, y1, color ):
             y = y + 1
             d = d + dx
 
+def zdraw_line( screen, x0, y0, z0, x1, y1, z1, color, zbuffer ):
+    dx = x1 - x0
+    dy = y1 - y0
+    dz = z1 - z0
+    if dx + dy < 0:
+        dx = 0 - dx
+        dy = 0 - dy
+        dz = 0 -dz
+        tmp = x0
+        x0 = x1
+        x1 = tmp
+        tmp = y0
+        y0 = y1
+        y1 = tmp
+        tmp = z0
+        z0 = z1
+        z1 = tmp
+
+    if dx == 0 and dy == 0:
+        zplot(screen, color, x0, y0, max(z0, z1), zbuffer)
+    elif dx == 0:
+        y = y0
+        z = z0
+        while y <= y1:
+            zplot(screen, color, x0, y, z, zbuffer)
+            y = y + 1
+            z += dz/dy
+    elif dy == 0:
+        x = x0
+        z = z0
+        while x <= x1:
+            zplot(screen, color, x, y0, z, zbuffer)
+            x = x + 1
+            z += dz/dx
+    elif dy < 0:
+        d = 0
+        x = x0
+        y = y0
+        z = z0
+        while x <= x1:
+            zplot(screen, color, x, y, z, zbuffer)
+            if d > 0:
+                y = y - 1
+                d = d - dx
+            x = x + 1
+            z += dz/dy
+            d = d - dy
+    elif dx < 0:
+        d = 0
+        x = x0
+        y = y0
+        z = z0
+        while y <= y1:
+            zplot(screen, color, x, y, z, zbuffer)
+            if d > 0:
+                x = x - 1
+                d = d - dy
+            y = y + 1
+            z += dz/dy
+            d = d - dx
+    elif dx > dy:
+        d = 0
+        x = x0
+        y = y0
+        z = z0
+        while x <= x1:
+            zplot(screen, color, x, y, z, zbuffer)
+            if d > 0:
+                y = y + 1
+                d = d - dx
+            x = x + 1
+            z += dz/dx
+            d = d + dy
+
+            

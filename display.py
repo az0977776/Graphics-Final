@@ -32,10 +32,9 @@ def z_plot( screen, color, x, y, z, zbuffer):
     x = int(x)
     y = int(y)
     newy = YRES - 1 - y
-    if ( x >= 0 and x < XRES and newy >= 0 and newy < YRES ):
+    if ( x >= 0 and x < XRES and newy >= 0 and newy < YRES and zbuffer[x][newy] < z):
         screen[x][newy] = color[:]
-        if z > zbuffer[x][y]:
-            zbuffer[x][y] = z
+        zbuffer[x][newy] = z
 
 def clear_screen( screen ):
     for y in range( len(screen) ):

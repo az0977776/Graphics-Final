@@ -53,13 +53,13 @@ from display import *
 from matrix import *
 from draw import *
 
+
 XRES = 500
 YRES = 500
 
 num_frames = 0
 basename = ""
 knobs = []
-zbuffer = new_screen()
 
 """======== first_pass( commands, symbols ) ==========
 
@@ -163,8 +163,17 @@ def run(filename):
 
         stack = [tmp]
         screen = new_screen()
+        lightsources = []
+        
+        zbuffer = new_matrix(XRES, YRES)
         
         for command in commands:
+            if command[0] == "ambient":
+                color = command[1:]
+
+            if command[0] == "light":
+                lightsources.append(command[1:])
+
             if command[0] == "pop":
                 stack.pop()
                 if not stack:
@@ -183,43 +192,43 @@ def run(filename):
                 m = []
                 add_sphere(m, command[1], command[2], command[3], command[4], 5)
                 matrix_mult(stack[-1], m)
-                draw_polygons( m, screen, color )
+                zdraw_polygons( m, screen, color, zbuffer, lightsources, constants )
 
             if command[0] == "torus":
                 m = []
                 add_torus(m, command[1], command[2], command[3], command[4], command[5], 5)
                 matrix_mult(stack[-1], m)
-                draw_polygons( m, screen, color )
+                zdraw_polygons( m, screen, color, zbuffer, lightsources, constants )
                 
             if command[0] == "box":                
                 m = []
                 add_box(m, *command[1:])
                 matrix_mult(stack[-1], m)
-                draw_polygons( m, screen, color )
+                zdraw_polygons( m, screen, color, zbuffer, lightsources, constants )
 
             if command[0] == "line":
                 m = []
                 add_edge(m, *command[1:])
                 matrix_mult(stack[-1], m)
-                draw_lines( m, screen, color )
+                zdraw_lines( m, screen, color, zbuffer )
 
             if command[0] == "bezier":
                 m = []
                 add_curve(m, command[1], command[2], command[3], command[4], command[5], command[6], command[7], command[8], .05, 'bezier')
                 matrix_mult(stack[-1], m)
-                draw_lines( m, screen, color )
+                zdraw_lines( m, screen, color, zbuffer )
                 
             if command[0] == "hermite":
                 m = []
                 add_curve(m, command[1], command[2], command[3], command[4], command[5], command[6], command[7], command[8], .05, 'hermite')
                 matrix_mult(stack[-1], m)
-                draw_lines( m, screen, color )
+                zdraw_lines( m, screen, color, zbuffer )
 
             if command[0] == "circle":
                 m = []
                 add_circle(m, command[1], command[2], command[3], command[4], .05)
                 matrix_mult(stack[-1], m)
-                draw_lines( m, screen, color )
+                zdraw_lines( m, screen, color, zbuffer )
             
             if command[0] in ["move", "scale", "rotate"]:
                 factor = 1
@@ -256,5 +265,6 @@ def run(filename):
                 
                     matrix_mult( stack[-1], t )
                     stack[-1] = t
-        
+
+                
         save_ppm(screen, "gif/" + basename + "%03d" % i)        
