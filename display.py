@@ -27,10 +27,6 @@ def plot( screen, color, x, y ):
     if ( x >= 0 and x < XRES and newy >= 0 and newy < YRES ):
         screen[x][newy] = color[:]
 
-def lighting_temp():
-    iambient =
-    idiffuse = 
-    ispecular =
         
 def z_plot( screen, color, x, y, z, zbuffer):
     x = int(x)

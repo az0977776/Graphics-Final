@@ -28,10 +28,10 @@ def draw_polygons( points, screen, color ):
                        points[p][0], points[p][1], color )
         p+= 3
 
-def scanline_conversion(points, screen, color):
+def scanline_conversion(points, screen, color, zbuffer):
     if len(points) < 3:
         print 'Need at least 3 points to fill'
-        p = 0
+    p = 0
     while p < len(points)-2:
         counter = 0
         pt = points[p]
@@ -43,7 +43,7 @@ def scanline_conversion(points, screen, color):
             #draw_line(screen, pb[0], pb[1], pb[0], pb[1], color)
             #draw_line(screen, pb[0] + d0, pb[1] + 1, pb[0] + d1, pb[1] + 1, color)
             draw_line(screen, pb[0] + counter * d0, pb[1] + counter, pb[0] + counter * d1, pb[1] + counter, color)
-            counter ++
+            counter+=1
 
 def add_box( points, x, y, z, width, height, depth ):
     x1 = x + width
