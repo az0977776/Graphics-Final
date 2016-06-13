@@ -28,11 +28,11 @@ def plot( screen, color, x, y ):
         screen[x][newy] = color[:]
 
         
-def z_plot( screen, color, x, y, z, zbuffer):
+def zplot( screen, color, x, y, z, zbuffer):
     x = int(x)
     y = int(y)
     newy = YRES - 1 - y
-    if ( x >= 0 and x < XRES and newy >= 0 and newy < YRES and zbuffer[x][newy] < z):
+    if ( x >= 0 and x < XRES and newy >= 0 and newy < YRES and z > zbuffer[x][newy]):
         screen[x][newy] = color[:]
         zbuffer[x][newy] = z
 

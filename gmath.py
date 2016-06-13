@@ -43,7 +43,7 @@ def vector_subtract(v0, v1):
     c = v0[2] - v2[2]
     return [a,b,c]
 
-def calculate_dot( point, i ):
+def calculate_dot( points, i ):
     ax = points[i + 1][0] - points[ i ][0]
     ay = points[i + 1][1] - points[ i ][1]
     az = points[i + 1][2] - points[ i ][2]

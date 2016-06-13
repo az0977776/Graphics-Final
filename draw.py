@@ -39,25 +39,25 @@ def zdraw_polygons( points, screen, color, zbuffer, lightsources ):
     while p < len( points ) - 2:
 
         if calculate_dot( points, p ) < 0:
-            color = lighting(color, light_normal(points, p), lightsources)
+            #color = lighting(color, light_normal(points, p), lightsources)
 
-            draw_line( screen, points[p][0], points[p][1], points[p][2],
+            zdraw_line( screen, points[p][0], points[p][1], points[p][2],
                        points[p+1][0], points[p+1][1], points[p+1][2], color, zbuffer )
 
-            draw_line( screen, points[p+1][0], points[p+1][1], points[p+1][2],
+            zdraw_line( screen, points[p+1][0], points[p+1][1], points[p+1][2],
                        points[p+2][0], points[p+2][1], points[p+2][2], color, zbuffer )
 
-            draw_line( screen, points[p+2][0], points[p+2][1], points[p+2][2],
+            zdraw_line( screen, points[p+2][0], points[p+2][1], points[p+2][2],
                        points[p][0], points[p][1],  points[p][2], color, zbuffer )
 
-            scanline([points[p], points[p + 1], points[p + 2]], screen, color, zbuffer)
+            scanline_conversion([points[p], points[p + 1], points[p + 2]], screen, color, zbuffer)
         p+= 3
 
 def lighting( color, normal, lightsource ):
     ambient = color
     diffuse = [0, 0, 0]
     specular = [0, 0, 0]
-    for source in lightsources:
+    for source in lightsource:
         if (source[0] == "diffuse"):
             pass
         if (source[0] == "specular"):
@@ -87,6 +87,11 @@ def scanline_conversion(points, screen, color, zbuffer):
         by = pb[1]
         bz = pb[2]
 
+        d1 = 1
+        dz1 = 1
+        d2 = 1
+        dz2 = 1
+        
         if (my != ty):
             d1 = (mx - tx) / (my - ty)
             dz1 = (mz - tz) / (my - ty)
@@ -109,7 +114,7 @@ def scanline_conversion(points, screen, color, zbuffer):
                 newx1 = mx + (newy - my) * d2
                 newz1 = mz + (newy - my) * dz2
 
-            draw_line( screen, newx0, newy, newz, newx1, newy, newz1, color, z_buffer)
+            zdraw_line( screen, newx0, newy, newz, newx1, newy, newz1, color, zbuffer)
 
             counter += 1
             

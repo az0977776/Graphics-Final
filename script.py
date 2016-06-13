@@ -192,19 +192,19 @@ def run(filename):
                 m = []
                 add_sphere(m, command[1], command[2], command[3], command[4], 5)
                 matrix_mult(stack[-1], m)
-                zdraw_polygons( m, screen, color, zbuffer, lightsources, constants )
+                zdraw_polygons( m, screen, color, zbuffer, lightsources)
 
             if command[0] == "torus":
                 m = []
                 add_torus(m, command[1], command[2], command[3], command[4], command[5], 5)
                 matrix_mult(stack[-1], m)
-                zdraw_polygons( m, screen, color, zbuffer, lightsources, constants )
+                zdraw_polygons( m, screen, color, zbuffer, lightsources)
                 
             if command[0] == "box":                
                 m = []
                 add_box(m, *command[1:])
                 matrix_mult(stack[-1], m)
-                zdraw_polygons( m, screen, color, zbuffer, lightsources, constants )
+                zdraw_polygons( m, screen, color, zbuffer, lightsources)
 
             if command[0] == "line":
                 m = []
