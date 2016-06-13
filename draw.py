@@ -59,7 +59,10 @@ def lighting( color, normal, lightsource ):
     specular = [0, 0, 0]
     for source in lightsource:
         if (source[0] == "diffuse"):
-            pass
+            lightr = source[1] * dot_product(source[4:], normal)
+            lightg = source[2] * dot_product(source[4:], normal)
+            lightb = source[3] * dot_product(source[4:], normal)
+            diffuse = [lightr,lightg,lightb]
         if (source[0] == "specular"):
             pass
     return [ambient[0] + diffuse[0] + specular[0], ambient[1] + diffuse[1] + specular[1], ambient[2] + diffuse[2] + specular[2]]
